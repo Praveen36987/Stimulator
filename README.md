@@ -51,27 +51,25 @@ This project builds a decision-support engine that turns the raw catalog into an
 4. **Product Segmenter** — K-Means (k=4) on price, rating, reviews, sales, demand, and margin.
 
 ---
-
 ## 🔍 Key Findings
 
-> Replace each `[fill in]` with the numbers your own run produces. The *direction* of each finding below is what the analysis is built to reveal — confirm it against your output.
+### 1. Pricing — sales barely respond to price, so margin is the lever
+A crucial data check came first: in the real catalog, **price is almost completely uncorrelated with units sold** (`final_price` vs `sold_quantity` = 0.002; `discount_pct` = 0.010). Sales simply don't move with price here. That's *why* pricing is modeled as an assumption-driven elasticity simulator rather than learned from data.
 
-### 1. Pricing
-- The profit-maximizing move is a **[fill in, e.g. +8%]** price change, lifting profit from **₹[fill in] Cr** to **₹[fill in] Cr**.
-- Because demand is elastic (assumed elasticity ≈ −1.5), deep discounts grow *units* but can shrink *profit* — the sweep makes the trade-off visible rather than guessed.
+Running the simulator on the full catalog (assumed elasticity −1.5), the profit-maximizing move is to **raise prices**, lifting modeled profit from **₹11.52 Cr to ₹17.35 Cr (+51%)**. The optimum sits at the very edge of the tested range, implying the model would push prices even higher — a direct consequence of that near-zero price sensitivity.
 
-### 2. Delivery
-- Delay risk is low for fast promises but climbs sharply past **[fill in] minutes**, where predicted delay probability crosses **[fill in]%**.
-- The model separates on-time vs. delayed deliveries with an **AUC of [fill in]** — [strong / moderate] discriminative power.
+> **Honest caveat:** this result is driven by the elasticity *assumption*, not observed behavior. Before acting on it, the recommendation would be to run a real price test (A/B) to measure true elasticity.
 
-### 3. Sales Drivers
-- **`demand_index` is the single dominant predictor of units sold.** The ablation test confirms it: R² drops from **[fill in]** to **[fill in]** when the feature is removed.
-- Gradient Boosting was the best model (R² = **[fill in]**, MAE = **[fill in]** units), beating Random Forest and Linear Regression.
-- After demand, the next most influential factors were **[fill in — e.g. price, rating, category]**.
+### 2. Delivery — risk climbs with promised time, but time alone explains only part of it
+The Logistic Regression hits **78.7% accuracy** with an **ROC-AUC of 0.687** — modest discriminative power. At a 30-minute promise, predicted delay risk is **~21%**, and it rises steadily as delivery time increases.
 
-### 4. Product Segments
-- K-Means produced **4 distinct segments** with sizes **[fill in]**.
-- The segments roughly map to: **[fill in — e.g. "high-demand low-margin staples", "premium niche products", etc.]**, each warranting a different pricing and stocking approach.
+The takeaway: delivery time genuinely affects delay risk, but an AUC of 0.69 means it's only a *partial* explanation. A stronger model would add city, seller, and weight.
+
+### 3. Sales Drivers — one feature carries almost the entire model
+**Gradient Boosting was the best predictor of units sold (R² = 0.886, MAE = 35 units)**, narrowly beating Random Forest (R² = 0.881) and Linear Regression (R² = 0.860).
+
+But the headline is the **ablation test**: remove `demand_index` and R² collapses from **0.886 to −0.003** — i.e. every other feature combined predicts essentially nothing. Feature importance confirms it: `demand_index` accounts for **97%** of the model's decisions, with `rating` a distant second (~2%). The raw correlation between `demand_index` and `sold_quantity` is **0.914**.
+
 
 ---
 
