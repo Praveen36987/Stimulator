@@ -58,7 +58,7 @@ A crucial data check came first: in the real catalog, **price is almost complete
 
 Running the simulator on the full catalog (assumed elasticity −1.5), the profit-maximizing move is to **raise prices**, lifting modeled profit from **₹11.52 Cr to ₹17.35 Cr (+51%)**. The optimum sits at the very edge of the tested range, implying the model would push prices even higher — a direct consequence of that near-zero price sensitivity.
 
-> **Honest caveat:** this result is driven by the elasticity *assumption*, not observed behavior. Before acting on it, the recommendation would be to run a real price test (A/B) to measure true elasticity.
+> **Honest caveat:** this result is driven by the elasticity *assumption*, not observed behavior.
 
 ### 2. Delivery — risk climbs with promised time, but time alone explains only part of it
 The Logistic Regression hits **78.7% accuracy** with an **ROC-AUC of 0.687** — modest discriminative power. At a 30-minute promise, predicted delay risk is **~21%**, and it rises steadily as delivery time increases.
@@ -75,7 +75,7 @@ But the headline is the **ablation test**: remove `demand_index` and R² collaps
 
 ## 💡 Recommendations
 
-> Anchor these to your actual findings above.
+
 
 1. **Pricing:** Move category pricing toward the simulated profit peak rather than defaulting to discounts; volume gains don't always pay for themselves.
 2. **Delivery:** Set delivery-time promises *below* the risk-spike threshold; beyond it, the chance of breaking the promise rises faster than the time saved is worth.
